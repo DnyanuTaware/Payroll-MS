@@ -1,11 +1,11 @@
 # Payroll Management system
 
 >How to set up a project
-1.clicking on <>code button on github download the zip file and extract its contents into other folder
-2.Open this folder in VS code
+1.clicking on <>code button on github download the zip file and extract its contents into other folder<br>
+2.Open this folder in VS code<br>
 3.In server.js set user ,password and database to your username  ,password and database_name
-    >>first create a database with the name database_name as follows (run this commands one by one in mysql command line client)
-    >>create database database_name;
+    >>first create a database with the name database_name as follows (run this commands one by one in mysql command line client)<br>
+    >>create database database_name;<br>
     >>use database_name;
 
     >>CREATE TABLE Employee (
@@ -48,16 +48,16 @@
 );
 
 
-4.Run server.js by using following  command in integrated terminal 
-    >>node server.js
-5.If you still having issue like modules not found then run the following command in integrated terminal of vs code
-    >>install express mysql body-parser cors
-6.now agin run the command
-    >>node server.js 
-    To run the backend...it will give u a msg database connected if no issues are there
-7.then to run the frontend 
-    >>install live server
-    >>run login.html by clicking on 'Go live' option(present at bottom right of window)
-    >>use username=Project
-          password=password123
-8.Finally go with your project inputs
+4.Run server.js by using following  command in integrated terminal <br>
+    >>node server.js<br>
+5.If you still having issue like modules not found then run the following command in integrated terminal of vs code<br>
+    >>install express mysql body-parser cors<br>
+6.now agin run the command<br>
+    >>node server.js <br>
+    To run the backend...it will give u a msg database connected if no issues are there<br>
+7.then to run the frontend <br>
+    >>install live server<br>
+    >>run login.html by clicking on 'Go live' option(present at bottom right of window)<br>
+    >>use username=Project<br>
+          password=password123<br>
+8.Finally go with your project inputs<br>
