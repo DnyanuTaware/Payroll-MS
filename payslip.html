@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Generate Payslip</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .section {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+
+        .section h2 {
+            margin-top: 0;
+        }
+
+        .total {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .net-salary {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Generate Payslip</h1>
+    <div class="container">
+        <div class="section" id="earningsSection">
+            <h2>Total Earnings</h2>
+            <p>Basic Salary: <span id="basicSalary"></span></p>
+            <p>HRA: <span id="hra"></span></p>
+            <p>MA: <span id="ma"></span></p>
+            <p>TA: <span id="ta"></span></p>
+            <p>Bonus: <span id="bonus"></span></p>
+            <p class="total">Total Earnings: <span id="totalEarnings"></span></p>
+        </div>
+
+        <div class="section" id="deductionsSection">
+            <h2>Total Deductions</h2>
+            <p>PF: <span id="pf"></span></p>
+            <p>Tax: <span id="tax"></span></p>
+            <p class="total">Total Deductions: <span id="totalDeductions"></span></p>
+        </div>
+    </div>
+
+    <div class="net-salary">
+        Net Salary: <span id="netSalary"></span>
+    <button onclick="window.location.href='display.html';" class="bg-grey-500 text-white p-2 rounded mt-4">Back</button>
+    </div>
+
+    <script>
+        function getEmployeeId() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id');
+        }
+
+        async function calculatePayslip() {
+            const employeeId = getEmployeeId();
+            try {
+                const response = await fetch(`http://localhost:3000/api/employee/${employeeId}`);
+                const employee = await response.json();
+
+                const basicSalary = employee.basic_salary;
+                const bonus = employee.bonus;
+                const hra = 10000;
+                const ma = 3000;
+                const ta = 2000;
+
+                const pf = basicSalary*0.12;
+                const tax =basicSalary > 50000 ? basicSalary*0.10 : basicSalary*0.05;
+                const totalEarnings = basicSalary + bonus + hra + ma + ta;
+                const totalDeductions = pf + tax;
+                const netSalary = totalEarnings - totalDeductions;
+
+                // Display values in HTML
+                document.getElementById("basicSalary").innerText = basicSalary.toFixed(2);
+                document.getElementById("hra").innerText = hra.toFixed(2);
+                document.getElementById("ma").innerText = ma.toFixed(2);
+                document.getElementById("ta").innerText = ta.toFixed(2);
+                document.getElementById("bonus").innerText = bonus.toFixed(2);
+                document.getElementById("totalEarnings").innerText = totalEarnings.toFixed(2);
+                document.getElementById("pf").innerText = pf.toFixed(2);
+                document.getElementById("tax").innerText = tax.toFixed(2);
+                document.getElementById("totalDeductions").innerText = totalDeductions.toFixed(2);
+                document.getElementById("netSalary").innerText = netSalary.toFixed(2);
+
+                // Insert payslip data into the database
+               // await insertPayslip(employeeId, basicSalary, bonus, hra, ma, ta, pf, tax, netSalary);
+            } catch (error) {
+                console.error('Error calculating payslip:', error);
+            }
+        }
+
+        async function insertPayslip(employeeId, basicSalary, bonus, hra, ma, ta, pf, tax, netSalary) {
+            const payslipData = {
+                employee_id: employeeId,
+                basic_salary: basicSalary,
+                bonus: bonus,
+                hra: hra,
+                ma: ma,
+                ta: ta,
+                pf: pf,
+                tax: tax,
+                net_salary: netSalary
+            };
+
+            try {
+                const response = await fetch('http://localhost:3000/api/payslip', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payslipData)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to insert payslip data');
+                }
+
+                console.log('Payslip data inserted successfully');
+            } catch (error) {
+                console.error('Error inserting payslip data:', error);
+            }
+        }
+
+        calculatePayslip();
+    </script>
+</body>
+</html>

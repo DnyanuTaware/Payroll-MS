@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Employee and Paygrade List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        table {
+            width: 80%;
+            margin: 0 auto;
+            border-collapse: collapse;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            text-align: center;
+            
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        button {
+            padding: 5px 10px;
+            background-color: #007bff;
+            margin-top:1rem;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+       
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Employee and Paygrade Details</h1>
+    <button onclick="window.location.href='home.html';" class="bg-blue-500 text-white p-2 rounded mt-4">Home</button>
+
+    <table id="employeePaygradeTable">
+        <thead>
+            <tr>
+                <th>Employee ID</th>
+                <th>Name</th>
+                <th>Age</th>
+                <th>Position</th>
+                <th>Email</th>
+                <th>Contact</th>
+                <th>Basic Salary</th>
+                <th>Bonus</th>
+                <th>PF</th>
+                <th>Tax</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data rows will be dynamically generated -->
+        </tbody>
+    </table>
+
+    <script>
+        // Function to fetch and display employee and paygrade data
+        async function fetchEmployeePaygradeData() {
+            try {
+                const response = await fetch('http://localhost:3000/api/employee-paygrade');
+                const employees = await response.json();
+
+                const tableBody = document.querySelector('#employeePaygradeTable tbody');
+                tableBody.innerHTML = ''; // Clear existing rows
+
+                employees.forEach(employee => {
+                    const row = document.createElement('tr');
+
+                    row.innerHTML = `
+                        <td>${employee.employee_id}</td>
+                        <td>${employee.name}</td>
+                        <td>${employee.age}</td>
+                        <td>${employee.employee_position}</td>
+                        <td>${employee.email}</td>
+                        <td>${employee.contact}</td>
+                        <td>${employee.basic_salary.toFixed(2)}</td>
+                        <td>${employee.bonus.toFixed(2)}</td>
+                        <td>${employee.pf.toFixed(2)}</td>
+                        <td>${employee.tax.toFixed(2)}</td>
+                        <td id="b1">
+                            <button onclick="updateEmployee(${employee.employee_id})">Update</button>
+                            <button onclick="deleteEmployee(${employee.employee_id})">Delete</button>
+                            <button onclick="generatePayslip(${employee.employee_id})">Generate Payslip</button>
+                        </td>
+                    `;
+
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error fetching employee and paygrade data:', error);
+            }
+        }
+
+        // Function to delete an employee
+        async function deleteEmployee(employeeId) {
+            if (confirm('Are you sure you want to delete this employee?')) {
+                try {
+                    const response = await fetch(`http://localhost:3000/api/employee/${employeeId}`, {
+                        method: 'DELETE'
+                    });
+                    if (response.ok) {
+                        alert('Employee deleted successfully!');
+                        fetchEmployeePaygradeData(); // Refresh the list
+                    } else {
+                        alert('Failed to delete employee.');
+                    }
+                } catch (error) {
+                    console.error('Error deleting employee:', error);
+                }
+            }
+        }
+
+        // Redirect to update page
+        function updateEmployee(employeeId) {
+            window.location.href = `update.html?id=${employeeId}`; // Pass ID in the URL
+        }
+
+        // Redirect to payslip page
+        function generatePayslip(employeeId) {
+            window.location.href = `payslip.html?id=${employeeId}`; // Pass ID in the URL
+        }
+
+        // Fetch employee and paygrade data on page load
+        fetchEmployeePaygradeData();
+    </script>
+</body>
+</html>

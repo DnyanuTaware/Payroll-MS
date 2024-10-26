@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Update Employee</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="number"],
+        input[type="date"] {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Update Employee Details</h1>
+    <form id="updateForm">
+        <label>Name: <input type="text" id="updateName" required></label>
+        <label>Address: <input type="text" id="updateAddress" required></label>
+        <label>Contact: <input type="text" id="updateContact" required></label>
+        <label>Position: <input type="text" id="updatePosition" required></label>
+        <label>Email: <input type="email" id="updateEmail" required></label>
+        <label>Basic Salary: <input type="number" id="updateBasicSalary" required oninput="calculatePFandTax()"></label>
+        <label>Bonus: <input type="number" id="updateBonus" required oninput="calculatePFandTax()"></label>
+        <label>PF: <input type="number" id="updatePF" readonly></label>
+        <label>Tax: <input type="number" id="updateTax" readonly></label>
+        <button type="button" onclick="submitUpdate()">Update</button>
+    </form>
+
+    <script>
+        function getEmployeeId() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id');
+        }
+
+        async function fetchEmployeeDetails() {
+            const employeeId = getEmployeeId();
+            try {
+                const response = await fetch(`http://localhost:3000/api/employee/${employeeId}`);
+                const employee = await response.json();
+                document.getElementById("updateName").value = employee.name;
+                document.getElementById("updateAddress").value = employee.address;
+                document.getElementById("updateContact").value = employee.contact;
+                document.getElementById("updatePosition").value = employee.position;
+                document.getElementById("updateEmail").value = employee.email;
+                document.getElementById("updateBasicSalary").value = employee.basic_salary;
+                document.getElementById("updateBonus").value = employee.bonus;
+                calculatePFandTax(); // Calculate PF and tax based on fetched data
+            } catch (error) {
+                console.error('Error fetching employee details:', error);
+            }
+        }
+
+        function calculatePFandTax() {
+            const basicSalary = parseFloat(document.getElementById("updateBasicSalary").value) || 0;
+            const bonus = parseFloat(document.getElementById("updateBonus").value) || 0;
+
+            const pf = basicSalary * 0.12; // 12% PF
+            const tax = basicSalary > 50000 ? basicSalary * 0.1 : basicSalary * 0.05; // 5% or 10% tax
+
+            document.getElementById("updatePF").value = pf.toFixed(2);
+            document.getElementById("updateTax").value = tax.toFixed(2);
+        }
+
+        async function submitUpdate() {
+            const employeeId = getEmployeeId();
+            const updatedData = {
+                name: document.getElementById("updateName").value,
+                address: document.getElementById("updateAddress").value,
+                contact: document.getElementById("updateContact").value,
+                employee_position: document.getElementById("updatePosition").value,
+                email: document.getElementById("updateEmail").value,
+                basic_salary: parseFloat(document.getElementById("updateBasicSalary").value),
+                bonus: parseFloat(document.getElementById("updateBonus").value)
+            };
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/employee/${employeeId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updatedData)
+                });
+
+                if (response.ok) {
+                    alert("Employee updated successfully!");
+                    window.location.href = 'display.html'; // Redirect back to the list
+                } else {
+                    alert("Failed to update employee.");
+                }
+            } catch (error) {
+                console.error('Error updating employee:', error);
+            }
+        }
+
+        fetchEmployeeDetails();
+    </script>
+</body>
+</html>
