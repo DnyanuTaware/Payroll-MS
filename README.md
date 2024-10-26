@@ -62,4 +62,8 @@
           password=password123<br>
 8.Finally go with your project inputs<br>
 hello its a change on new branch vs previously it is upto date with main
+<<<<<<< HEAD
 local change in vs
+=======
+change from github
+>>>>>>> 7755315ba9fe9e3ffc5d2f28904fabd7f4c3f86a
